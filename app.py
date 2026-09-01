@@ -1,3 +1,4 @@
+from types import SimpleNamespace
 import streamlit as st
 from utils.supabase import supabase
 
@@ -35,7 +36,7 @@ with tab1:
 
             if len(response.data) > 0:
                 user_profile = response.data[0]
-                st.session_state.user = st.types.SimpleNamespace(
+                st.session_state.user = SimpleNamespace(
                     id=user_profile["id"],
                     email=user_profile["email"],
                     nickname=user_profile["nickname"]
@@ -89,7 +90,7 @@ with tab2:
 
                     new_user = res.data[0]
 
-                    st.session_state.user = st.types.SimpleNamespace(
+                    st.session_state.user = SimpleNamespace(
                         id=new_user["id"],
                         email=new_user["email"],
                         nickname=new_user["nickname"]
