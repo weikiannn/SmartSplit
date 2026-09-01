@@ -139,7 +139,7 @@ else:
                 st.caption("Member")
 
             invite_link = (
-                "https://smartsplit.streamlit.app/"
+                "https://smartsplits.streamlit.app/"
                 f"?join={group['invite_code']}"
             )
 
