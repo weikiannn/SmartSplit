@@ -1,4 +1,3 @@
-import uuid
 import streamlit as st
 from utils.supabase import supabase
 
@@ -36,7 +35,6 @@ with tab1:
 
             if len(response.data) > 0:
                 user_profile = response.data[0]
-                # Store lightweight user session mock
                 st.session_state.user = st.types.SimpleNamespace(
                     id=user_profile["id"],
                     email=user_profile["email"],
@@ -83,23 +81,24 @@ with tab2:
             if not clean_nick:
                 st.error("Please enter a nickname.")
             else:
-                new_id = str(uuid.uuid4())
-                user_data = {
-                    "id": new_id,
-                    "email": st.session_state.pending_email,
-                    "nickname": clean_nick
-                }
+                try:
+                    res = supabase.table("profiles").insert({
+                        "email": st.session_state.pending_email,
+                        "nickname": clean_nick
+                    }).execute()
 
-                supabase.table("profiles").insert(user_data).execute()
+                    new_user = res.data[0]
 
-                st.session_state.user = st.types.SimpleNamespace(
-                    id=new_id,
-                    email=st.session_state.pending_email,
-                    nickname=clean_nick
-                )
+                    st.session_state.user = st.types.SimpleNamespace(
+                        id=new_user["id"],
+                        email=new_user["email"],
+                        nickname=new_user["nickname"]
+                    )
 
-                del st.session_state.signup_stage
-                del st.session_state.pending_email
+                    del st.session_state.signup_stage
+                    del st.session_state.pending_email
 
-                st.success("Account created successfully!")
-                st.switch_page("pages/2_Groups.py")
+                    st.success("Account created successfully!")
+                    st.switch_page("pages/2_Groups.py")
+                except Exception as e:
+                    st.error(f"Sign up failed: {e}")
